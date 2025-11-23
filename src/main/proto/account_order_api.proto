@@ -2,21 +2,11 @@ syntax = "proto3";
 
 package account;
 
+import "account_commons.proto";
+
 option java_multiple_files = true;
 option java_package = "com.hts.generated.grpc";
-option java_outer_classname = "AccountProto";
-
-// 공통 응답 코드
-enum AccoutResult {
-  SUCCESS = 0;
-  INSUFFICIENT_FUNDS = 1;
-  ACCOUNT_NOT_FOUND = 2;
-  INTERNAL_ERROR = 3;
-  INVALID_REQUEST = 4;
-  ACCOUNT_SUSPENDED = 5;
-  DUPLICATE_REQUEST = 6;
-  INVALID_AMOUNT = 7;
-}
+option java_outer_classname = "AccountOrderProto";
 
 // 예수금 예약 요청
 message ReserveCashRequest {
@@ -46,35 +36,9 @@ message CancelPositionReserveRequest{
   string reserve_id = 2;
 }
 
-// 공통 응답 메시지
-message CommonReply {
-  AccoutResult code = 1;
-}
-
-// 계정 생성 요청
-message CreateAccountRequest {
-  int64 account_id = 1;
-  string password = 2;
-}
-
-// 계정 삭제 요청
-message DeleteAccountRequest {
-  int64 account_id = 1;
-}
-
-// 계정 상태 변경 요청
-message UpdateAccountStatusRequest {
-  int64 account_id = 1;
-  string status = 2;  // ACTIVE, LOCKED, SUSPENDED
-  string reason = 3;
-}
-
-service AccountService {
+service AccountOrderService {
   rpc ReserveCash(ReserveCashRequest) returns (CommonReply);
   rpc CancelCashReserve(CancelCashReserveRequest) returns (CommonReply);
   rpc ReservePosition(ReservePositionRequest) returns (CommonReply);
   rpc CancelPositionReserve(CancelPositionReserveRequest) returns (CommonReply);
-  rpc CreateAccount(CreateAccountRequest) returns (CommonReply);
-  rpc DeleteAccount(DeleteAccountRequest) returns (CommonReply);
-  rpc UpdateAccountStatus(UpdateAccountStatusRequest) returns (CommonReply);
 }

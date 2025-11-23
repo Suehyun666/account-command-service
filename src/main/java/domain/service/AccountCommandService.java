@@ -148,37 +148,4 @@ public class AccountCommandService {
             return ServiceResult.of(AccoutResult.INTERNAL_ERROR);
         }
     }
-
-    public ServiceResult updateAccountStatus(long accountId, String status, String reason) {
-        long startNanos = System.nanoTime();
-
-        try {
-            AccountWriteResult writeResult = writeRepo.updateAccountStatus(accountId, status);
-
-            if (writeResult.isSuccess() && writeResult.snapshot() != null) {
-                // Redis 캐시 업데이트
-                try {
-                    redis.set(writeResult.snapshot());
-                } catch (Exception e) {
-                    log.warnf(e, "Failed to update account cache. accountId=%d", accountId);
-                }
-
-                // Kafka 이벤트 발행
-                eventProducer.publishAccountStatusChanged(accountId, status, reason);
-
-                long durationNanos = System.nanoTime() - startNanos;
-                metrics.record("update_account_status", "SUCCESS", durationNanos);
-                return ServiceResult.success();
-            } else {
-                long durationNanos = System.nanoTime() - startNanos;
-                metrics.record("update_account_status", "NOT_FOUND", durationNanos);
-                return writeResult.result();
-            }
-        } catch (Exception e) {
-            log.errorf(e, "Failed to update account status: accountId=%d, status=%s", accountId, status);
-            long durationNanos = System.nanoTime() - startNanos;
-            metrics.record("update_account_status", "FAILURE", durationNanos);
-            return ServiceResult.of(AccoutResult.INTERNAL_ERROR);
-        }
-    }
 }

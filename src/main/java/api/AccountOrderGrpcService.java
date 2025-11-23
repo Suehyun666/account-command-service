@@ -17,7 +17,7 @@ import util.MoneyParser;
 import java.math.BigDecimal;
 
 @GrpcService
-public class AccountGrpcService implements AccountService {
+public class AccountOrderGrpcService implements AccountOrderService {
 
     @Inject AccountCommandService accountCommandService;
     @Inject PositionCommandService positionCommandService;
@@ -129,61 +129,4 @@ public class AccountGrpcService implements AccountService {
                 .setCode(result.code())
                 .build();
     }
-
-    @Override
-    public Uni<CommonReply> createAccount(CreateAccountRequest request) {
-        long accountId = request.getAccountId();
-
-        if (accountId <= 0) {
-            return Uni.createFrom().item(toReply(ServiceResult.of(AccoutResult.INVALID_REQUEST)));
-        }
-
-        String password = request.getPassword();
-        if (password == null || password.isBlank()) {
-            return Uni.createFrom().item(toReply(ServiceResult.of(AccoutResult.INVALID_REQUEST)));
-        }
-
-        return invoker.invoke(accountId,
-                () -> accountCommandService.createAccount(accountId, password, "")
-        ).onItem().transform(this::toReply);
-    }
-
-    @Override
-    public Uni<CommonReply> deleteAccount(DeleteAccountRequest request) {
-        long accountId = request.getAccountId();
-
-        if (accountId <= 0) {
-            return Uni.createFrom().item(toReply(ServiceResult.of(AccoutResult.INVALID_REQUEST)));
-        }
-
-        return invoker.invoke(accountId,
-                () -> accountCommandService.deleteAccount(accountId)
-        ).onItem().transform(this::toReply);
-    }
-
-    @Override
-    public Uni<CommonReply> updateAccountStatus(UpdateAccountStatusRequest request) {
-        long accountId = request.getAccountId();
-
-        if (accountId <= 0) {
-            return Uni.createFrom().item(toReply(ServiceResult.of(AccoutResult.INVALID_REQUEST)));
-        }
-
-        String status = request.getStatus();
-        if (status == null || status.isBlank()) {
-            return Uni.createFrom().item(toReply(ServiceResult.of(AccoutResult.INVALID_REQUEST)));
-        }
-
-        String reason = request.getReason();
-        if (reason == null) {
-            reason = "";
-        }
-
-        String finalReason = reason;
-        return invoker.invoke(accountId,
-                () -> accountCommandService.updateAccountStatus(accountId, status, finalReason)
-        ).onItem().transform(this::toReply);
-    }
 }
-
-

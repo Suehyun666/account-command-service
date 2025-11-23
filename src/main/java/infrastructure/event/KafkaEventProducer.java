@@ -18,10 +18,6 @@ public class KafkaEventProducer {
     Emitter<byte[]> accountCreatedEmitter;
 
     @Inject
-    @Channel("account-status-events")
-    Emitter<byte[]> accountStatusEmitter;
-
-    @Inject
     @Channel("account-deleted-events")
     Emitter<byte[]> accountDeletedEmitter;
 
@@ -39,23 +35,6 @@ public class KafkaEventProducer {
             LOG.infof("Published AccountCreatedEvent: accountId=%d", accountId);
         } catch (Exception e) {
             LOG.errorf(e, "Failed to publish AccountCreatedEvent: accountId=%d", accountId);
-        }
-    }
-
-    public void publishAccountStatusChanged(long accountId, String status, String reason) {
-        try {
-            AccountStatusChangedEvent event = AccountStatusChangedEvent.newBuilder()
-                    .setAccountId(accountId)
-                    .setStatus(status)
-                    .setReason(reason)
-                    .setTimestamp(System.currentTimeMillis())
-                    .build();
-
-            byte[] payload = event.toByteArray();
-            accountStatusEmitter.send(Message.of(payload));
-            LOG.infof("Published AccountStatusChangedEvent: accountId=%d, status=%s", accountId, status);
-        } catch (Exception e) {
-            LOG.errorf(e, "Failed to publish AccountStatusChangedEvent: accountId=%d", accountId);
         }
     }
 

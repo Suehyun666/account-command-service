@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package account;
+
+import "account_commons.proto";
+
+option java_multiple_files = true;
+option java_package = "com.hts.generated.grpc";
+option java_outer_classname = "AccountAdminProto";
+
+// 계정 생성 요청
+message CreateAccountRequest {
+  int64 account_id = 1;
+  string password = 2;
+}
+
+// 계정 삭제 요청
+message DeleteAccountRequest {
+  int64 account_id = 1;
+}
+
+service AccountAdminService {
+  rpc CreateAccount(CreateAccountRequest) returns (CommonReply);
+  rpc DeleteAccount(DeleteAccountRequest) returns (CommonReply);
+}

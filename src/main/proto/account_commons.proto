@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package account;
+
+option java_multiple_files = true;
+option java_package = "com.hts.generated.grpc";
+option java_outer_classname = "CommonsProto";
+
+// 공통 응답 코드
+enum AccoutResult {
+  SUCCESS = 0;
+  INSUFFICIENT_FUNDS = 1;
+  ACCOUNT_NOT_FOUND = 2;
+  INTERNAL_ERROR = 3;
+  INVALID_REQUEST = 4;
+  ACCOUNT_SUSPENDED = 5;
+  DUPLICATE_REQUEST = 6;
+  INVALID_AMOUNT = 7;
+}
+
+// 공통 응답 메시지
+message CommonReply {
+  AccoutResult code = 1;
+}
