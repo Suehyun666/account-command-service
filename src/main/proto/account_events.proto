@@ -1,36 +1,15 @@
 syntax = "proto3";
 
-package events;
+package events.account;
 
 option java_multiple_files = true;
-option java_package = "com.hts.generated.events";
-option java_outer_classname = "AccountEventsProto";
+option java_package = "com.hts.generated.events.account";
+option java_outer_classname = "AccountEventProto";
 
-// 입금 이벤트 (Payment → Account)
-message DepositEvent {
-  string event_id = 1;        // 멱등성 키
-  int64 account_id = 2;       // Partition Key
-  string amount = 3;          // "1000.00"
-  string currency = 4;        // USD, KRW
-  string source = 5;          // BANK_TRANSFER, WIRE
-  int64 timestamp = 6;
-}
-
-// 출금 이벤트 (Payment → Account)
-message WithdrawEvent {
-  string event_id = 1;
-  int64 account_id = 2;       // Partition Key
-  string amount = 3;
-  string currency = 4;
-  string destination = 5;     // BANK_ACCOUNT
-  int64 timestamp = 6;
-}
-
-// 체결 이벤트 from order?
 message AccountFillAppliedEvent {
   string event_id = 1;
   int64 account_id = 2;
-  string amount = 3;
+  int64 amount_micro_units = 3;
   string symbol = 4;
   string side = 5;
   int64 timestamp = 6;

@@ -6,7 +6,23 @@ option java_multiple_files = true;
 option java_package = "com.hts.generated.grpc";
 option java_outer_classname = "CommonsProto";
 
-// 공통 응답 코드
+// === Value Objects ===
+
+message AccountId {
+  int64 value = 1;
+}
+
+message ReserveId {
+  string value = 1;
+}
+
+message Money {
+  int64 micro_units = 1;  // 1,000,000 = 1.0 (6자리 precision)
+  string currency = 2;
+}
+
+// === Result Codes ===
+
 enum AccoutResult {
   SUCCESS = 0;
   INSUFFICIENT_FUNDS = 1;
@@ -16,9 +32,11 @@ enum AccoutResult {
   ACCOUNT_SUSPENDED = 5;
   DUPLICATE_REQUEST = 6;
   INVALID_AMOUNT = 7;
+  INSUFFICIENT_POSITION = 8;
+  POSITION_NOT_FOUND = 9;
+  NOT_IMPLEMENTED = 10;
 }
 
-// 공통 응답 메시지
 message CommonReply {
   AccoutResult code = 1;
 }

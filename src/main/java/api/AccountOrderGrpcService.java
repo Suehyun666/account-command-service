@@ -1,132 +1,112 @@
 package api;
 
-import com.hts.generated.grpc.*;
-import domain.model.*;
+import com.hts.generated.grpc.account.order.*;
+import com.hts.generated.grpc.CommonReply;
 import domain.model.command.ReserveCashCommand;
 import domain.model.command.ReservePositionCommand;
-import domain.model.command.UnreserveCashCommand;
-import domain.model.command.UnreservePositionCommand;
-import domain.service.AccountCommandService;
+import domain.model.command.ReleaseCashCommand;
+import domain.model.command.ReleasePositionCommand;
+import domain.model.result.CommandResult;
+import domain.service.BalanceCommandService;
 import domain.service.PositionCommandService;
 import infrastructure.shard.AccountShardInvoker;
 import io.quarkus.grpc.GrpcService;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
-import util.MoneyParser;
 
 import java.math.BigDecimal;
 
 @GrpcService
 public class AccountOrderGrpcService implements AccountOrderService {
 
-    @Inject AccountCommandService accountCommandService;
+    @Inject BalanceCommandService balanceCommandService;
     @Inject PositionCommandService positionCommandService;
     @Inject AccountShardInvoker invoker;
 
     @Override
     public Uni<CommonReply> reserveCash(ReserveCashRequest request) {
         long accountId = request.getAccountId();
+        long amountMicroUnits = request.getAmountMicroUnits();
+        String reserveId = request.getReserveId();
 
         if (accountId <= 0) {
-            return Uni.createFrom().item(toReply(ServiceResult.of(AccoutResult.ACCOUNT_NOT_FOUND)));
+            return Uni.createFrom().item(toReply(CommandResult.accountNotFound()));
         }
-
-        BigDecimal amount = MoneyParser.parseSafe(request.getAmount());
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            return Uni.createFrom().item(toReply(ServiceResult.of(AccoutResult.INVALID_AMOUNT)));
+        if (amountMicroUnits <= 0) {
+            return Uni.createFrom().item(toReply(CommandResult.fail("INVALID_AMOUNT", "Invalid amount")));
         }
-
-        String reserveId = request.getReserveId();
         if (reserveId == null || reserveId.isBlank()) {
-            return Uni.createFrom().item(toReply(ServiceResult.of(AccoutResult.INVALID_REQUEST)));
+            return Uni.createFrom().item(toReply(CommandResult.fail("INVALID_REQUEST", "Invalid reserve ID")));
         }
 
-        ReserveCashCommand cmd = new ReserveCashCommand(
-                accountId,
-                amount,
-                reserveId,
-                request.getOrderId()
-        );
-
-        return invoker.invoke(accountId,
-                () -> accountCommandService.reserveCash(cmd)
-        ).onItem().transform(this::toReply);
+        BigDecimal amount = BigDecimal.valueOf(amountMicroUnits).divide(BigDecimal.valueOf(1_000_000));
+        ReserveCashCommand cmd = new ReserveCashCommand(accountId, amount, reserveId, request.getOrderId());
+        return invoker.invoke(accountId, () -> balanceCommandService.reserveCash(cmd))
+                .onItem().transform(this::toReply);
     }
 
     @Override
-    public Uni<CommonReply> cancelCashReserve(CancelCashReserveRequest request) {
+    public Uni<CommonReply> releaseCash(ReleaseCashRequest request) {
         long accountId = request.getAccountId();
+        String reserveId = request.getReserveId();
 
         if (accountId <= 0) {
-            return Uni.createFrom().item(toReply(ServiceResult.of(AccoutResult.ACCOUNT_NOT_FOUND)));
+            return Uni.createFrom().item(toReply(CommandResult.accountNotFound()));
         }
-
-        String reserveId = request.getReserveId();
         if (reserveId == null || reserveId.isBlank()) {
-            return Uni.createFrom().item(toReply(ServiceResult.of(AccoutResult.INVALID_REQUEST)));
+            return Uni.createFrom().item(toReply(CommandResult.fail("INVALID_REQUEST", "Invalid reserve ID")));
         }
 
-        UnreserveCashCommand cmd = new UnreserveCashCommand(accountId, reserveId);
-
-        return invoker.invoke(accountId,
-                () -> accountCommandService.unreserveCash(cmd)
-        ).onItem().transform(this::toReply);
+        ReleaseCashCommand cmd = new ReleaseCashCommand(accountId, reserveId);
+        return invoker.invoke(accountId, () -> balanceCommandService.releaseCash(cmd))
+                .onItem().transform(this::toReply);
     }
 
     @Override
     public Uni<CommonReply> reservePosition(ReservePositionRequest request) {
         long accountId = request.getAccountId();
+        String symbol = request.getSymbol();
+        long quantity = request.getQuantity();
+        String reserveId = request.getReserveId();
 
         if (accountId <= 0) {
-            return Uni.createFrom().item(toReply(ServiceResult.of(AccoutResult.ACCOUNT_NOT_FOUND)));
+            return Uni.createFrom().item(toReply(CommandResult.accountNotFound()));
         }
-
-        String symbol = request.getSymbol();
         if (symbol == null || symbol.isBlank()) {
-            return Uni.createFrom().item(toReply(ServiceResult.of(AccoutResult.INVALID_REQUEST)));
+            return Uni.createFrom().item(toReply(CommandResult.fail("INVALID_REQUEST", "Invalid symbol")));
         }
-
-        long qty = request.getQuantity();
-        if (qty <= 0) {
-            return Uni.createFrom().item(toReply(ServiceResult.of(AccoutResult.INVALID_AMOUNT)));
+        if (quantity <= 0) {
+            return Uni.createFrom().item(toReply(CommandResult.fail("INVALID_AMOUNT", "Invalid quantity")));
+        }
+        if (reserveId == null || reserveId.isBlank()) {
+            return Uni.createFrom().item(toReply(CommandResult.fail("INVALID_REQUEST", "Invalid reserve ID")));
         }
 
         ReservePositionCommand cmd = new ReservePositionCommand(
-                accountId,
-                symbol,
-                BigDecimal.valueOf(qty),
-                request.getReserveId(),
-                request.getOrderId()
+                accountId, symbol, BigDecimal.valueOf(quantity), reserveId, request.getOrderId()
         );
-
-        return invoker.invoke(accountId,
-                () -> positionCommandService.reservePosition(cmd)
-        ).onItem().transform(this::toReply);
+        return invoker.invoke(accountId, () -> positionCommandService.reservePosition(cmd))
+                .onItem().transform(this::toReply);
     }
 
     @Override
-    public Uni<CommonReply> cancelPositionReserve(CancelPositionReserveRequest request) {
+    public Uni<CommonReply> releasePosition(ReleasePositionRequest request) {
         long accountId = request.getAccountId();
+        String reserveId = request.getReserveId();
 
         if (accountId <= 0) {
-            return Uni.createFrom().item(toReply(ServiceResult.of(AccoutResult.ACCOUNT_NOT_FOUND)));
+            return Uni.createFrom().item(toReply(CommandResult.accountNotFound()));
         }
-
-        String reserveId = request.getReserveId();
         if (reserveId == null || reserveId.isBlank()) {
-            return Uni.createFrom().item(toReply(ServiceResult.of(AccoutResult.INVALID_REQUEST)));
+            return Uni.createFrom().item(toReply(CommandResult.fail("INVALID_REQUEST", "Invalid reserve ID")));
         }
 
-        UnreservePositionCommand cmd = new UnreservePositionCommand(accountId, reserveId);
-
-        return invoker.invoke(accountId,
-                () -> positionCommandService.unreservePosition(cmd)
-        ).onItem().transform(this::toReply);
+        ReleasePositionCommand cmd = new ReleasePositionCommand(accountId, reserveId);
+        return invoker.invoke(accountId, () -> positionCommandService.releasePosition(cmd))
+                .onItem().transform(this::toReply);
     }
 
-    private CommonReply toReply(ServiceResult result) {
-        return CommonReply.newBuilder()
-                .setCode(result.code())
-                .build();
+    private CommonReply toReply(CommandResult result) {
+        return CommonReply.newBuilder().setCode(result.toGrpcCode()).build();
     }
 }

@@ -1,44 +1,42 @@
 syntax = "proto3";
 
-package account;
+package account.order.v1;
 
 import "account_commons.proto";
 
 option java_multiple_files = true;
-option java_package = "com.hts.generated.grpc";
-option java_outer_classname = "AccountOrderProto";
+option java_package = "com.hts.generated.grpc.account.order";
+option java_outer_classname = "AccountOrderApiProto";
 
-// 예수금 예약 요청
 message ReserveCashRequest {
   int64 account_id = 1;
-  string amount = 2;        // 가격 BigDecimal로 파싱
-  string reserve_id = 3;    // 멱등성 + 예약 식별자
-  string order_id = 4;  // 클라이언트 로컬 주문 ID
+  int64 amount_micro_units = 2;
+  string currency = 3;
+  string reserve_id = 4;
+  string order_id = 5;
 }
 
-// 예수금 예약 해제 요청
-message CancelCashReserveRequest {
+message ReleaseCashRequest {
   int64 account_id = 1;
   string reserve_id = 2;
 }
 
-message ReservePositionRequest{
+message ReservePositionRequest {
   int64 account_id = 1;
-  string symbol = 2;        // 종목 코드
-  string amount = 3;        // 가격 BigDecimal로 파싱
-  int64 quantity = 4;       // 예약 수량
-  string reserve_id = 5;    // 멱등성 + 예약 식별자
-  string order_id = 6;      // 클라이언트 로컬 주문 ID
+  string symbol = 2;
+  int64 quantity = 3;
+  string reserve_id = 4;
+  string order_id = 5;
 }
 
-message CancelPositionReserveRequest{
+message ReleasePositionRequest {
   int64 account_id = 1;
   string reserve_id = 2;
 }
 
 service AccountOrderService {
-  rpc ReserveCash(ReserveCashRequest) returns (CommonReply);
-  rpc CancelCashReserve(CancelCashReserveRequest) returns (CommonReply);
-  rpc ReservePosition(ReservePositionRequest) returns (CommonReply);
-  rpc CancelPositionReserve(CancelPositionReserveRequest) returns (CommonReply);
+  rpc ReserveCash(ReserveCashRequest) returns (account.CommonReply);
+  rpc ReleaseCash(ReleaseCashRequest) returns (account.CommonReply);
+  rpc ReservePosition(ReservePositionRequest) returns (account.CommonReply);
+  rpc ReleasePosition(ReleasePositionRequest) returns (account.CommonReply);
 }

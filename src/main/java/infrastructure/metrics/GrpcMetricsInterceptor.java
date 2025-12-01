@@ -1,7 +1,5 @@
-package infrastructure.grpc;
+package infrastructure.metrics;
 
-import infrastructure.metrics.EndToEndMetrics;
-import infrastructure.metrics.GrpcMetrics;
 import io.grpc.*;
 import io.grpc.ForwardingServerCall.SimpleForwardingServerCall;
 import io.quarkus.grpc.GlobalInterceptor;

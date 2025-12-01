@@ -35,6 +35,8 @@ dependencies {
     implementation 'io.quarkus:quarkus-micrometer-registry-prometheus'
     implementation 'io.quarkus:quarkus-smallrye-fault-tolerance'
     implementation 'io.quarkus:quarkus-smallrye-health'
+    implementation 'io.quarkus:quarkus-scheduler'
+
 
     // Deployment
     implementation 'io.quarkiverse.config:quarkus-config-consul'
@@ -62,6 +64,7 @@ test {
     systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
     jvmArgs "--add-opens", "java.base/java.lang=ALL-UNNAMED"
 }
+
 compileJava {
     options.encoding = 'UTF-8'
     options.compilerArgs << '-parameters'

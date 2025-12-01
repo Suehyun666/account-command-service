@@ -1,0 +1,31 @@
+-- WITH new_accounts AS (
+-- INSERT INTO accounts (account_id, account_no, balance, reserved, currency, status, created_at, updated_at)
+-- SELECT
+--     i,                -- account_id (1000 ~ 2001 강제 지정)
+--     i::TEXT,          -- account_no ('1000' ~ '2001')
+--     100000.00,        -- balance
+--     0,                -- reserved
+--     'USD',            -- currency
+--     'ACTIVE',         -- status
+--     now(),            -- created_at
+--     now()             -- updated_at
+-- FROM generate_series(1000, 2001) AS i
+--     ON CONFLICT (account_id) DO NOTHING
+--     RETURNING account_id, account_no, balance
+-- )
+-- INSERT INTO account_ledger (
+--     account_id,
+--     entry_type,
+--     request_id,
+--     amount,
+--     created_at
+-- )
+-- SELECT
+--     account_id,
+--     'DEPOSIT',
+--     'INIT_' || account_no,
+--     balance,
+--     now()
+-- FROM new_accounts;
+--
+-- SELECT setval('accounts_account_id_seq', COALESCE((SELECT MAX(account_id) FROM accounts), 1));

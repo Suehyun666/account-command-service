@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package events.order;
+
+import "order_commons.proto";
+
+option java_multiple_files = true;
+option java_package = "com.hts.generated.events.order";
+option java_outer_classname = "OrderEventsProto";
+
+message OrderFillEvent {
+  string event_id = 1;
+  string client_order_id = 2;
+  int64 account_id = 3;
+  int32 security_id = 4;
+  .order.Side side = 5;
+  ExecutionType execution_type = 6;
+  GatewayOrderStatus gateway_status = 7;
+  repeated .order.FillGroup fills = 8;
+  int64 leaves_quantity = 9;
+  int64 transact_time = 10;
+}
+
+enum ExecutionType {
+  EXECUTION_UNKNOWN = 0;
+  NEW = 1;
+  TRADE = 2;
+  TRADE_CORRECT = 3;
+  TRADE_CANCEL = 4;
+  CANCELLED = 5;
+  AMENDED = 6;
+  REJECTED = 7;
+  EXPIRED = 8;
+  SUSPENDED = 9;
+  RESTATED = 10;
+  TRIGGERED = 11;
+}
+
+enum GatewayOrderStatus {
+  GATEWAY_STATUS_UNKNOWN = 0;
+  GATEWAY_NEW = 1;
+  GATEWAY_PARTIALLY_FILLED = 2;
+  GATEWAY_FILLED = 3;
+  GATEWAY_CANCELLED = 4;
+  GATEWAY_EXPIRED = 5;
+  GATEWAY_REJECTED = 6;
+  GATEWAY_SUSPENDED = 7;
+}

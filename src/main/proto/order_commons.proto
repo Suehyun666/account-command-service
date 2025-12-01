@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package order;
+
+option java_multiple_files = true;
+option java_package = "com.hts.generated.grpc";
+option java_outer_classname = "OrderCommons";
+
+// === Value Objects ===
+
+message OrderId {
+  string value = 1;
+}
+
+message SecurityId {
+  int32 value = 1;
+}
+
+message Price {
+  int64 micro_units = 1;  // 1,000,000 = 1.0
+}
+
+message Quantity {
+  int64 value = 1;
+}
+
+// === Enums ===
+
+enum OrderType {
+  MARKET = 0;
+  LIMIT = 1;
+}
+
+enum Side {
+  SIDE_UNKNOWN = 0;
+  BUY = 1;   // CoinTossX: 1
+  SELL = 2;  // CoinTossX: 2
+}
+
+enum TimeInForce {
+  DAY = 0;
+  GTC = 1;  // Good Till Cancel
+  IOC = 2;  // Immediate or Cancel
+  FOK = 3;  // Fill or Kill
+}
+
+enum OrderStatus {
+  RECEIVED = 0;
+  ACCEPTED = 1;
+  SENT = 2;
+  PARTIALLY_FILLED = 3;
+  FILLED = 4;
+  CANCEL_REQUESTED = 5;
+  CANCELED = 6;
+  REJECTED = 7;
+}
+
+// === Complex Types ===
+
+message FillGroup {
+  int64 price_micro_units = 1;
+  int64 quantity = 2;
+}

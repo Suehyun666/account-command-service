@@ -1,6 +1,7 @@
 package infrastructure.event;
 
-import com.hts.generated.events.*;
+import com.hts.generated.events.auth.AccountCreatedEvent;
+import com.hts.generated.events.auth.AccountDeletedEvent;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.reactive.messaging.Channel;

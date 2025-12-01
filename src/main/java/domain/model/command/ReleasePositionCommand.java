@@ -1,6 +1,6 @@
 package domain.model.command;
 
-public record UnreserveCashCommand(
+public record ReleasePositionCommand(
         long accountId,
         String requestId
 ) {}
