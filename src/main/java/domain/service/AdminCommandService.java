@@ -4,9 +4,11 @@ import infrastructure.event.KafkaEventProducer;
 import infrastructure.metrics.CommandMetrics;
 import infrastructure.repository.AccountWriteRepository;
 import io.smallrye.mutiny.Uni;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.jboss.logging.Logger;
 
+@ApplicationScoped
 public class AdminCommandService {
 
     private static final Logger log = Logger.getLogger(BalanceCommandService.class);

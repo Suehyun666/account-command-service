@@ -1,15 +1,16 @@
 package infrastructure.repository;
 
 import infrastructure.metrics.DbMetrics;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.jooq.DSLContext;
 import org.jooq.exception.DataAccessException;
 
+@ApplicationScoped
 public class AccountWriteRepository {
 
     @Inject DSLContext dsl;
     @Inject DbMetrics metrics;
-    @Inject OutboxRepository outboxRepo;
 
     public boolean createAccount(long accountId) {
         long startNanos = System.nanoTime();
