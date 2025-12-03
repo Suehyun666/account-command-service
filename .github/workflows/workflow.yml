@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 env:
-  DOCKER_IMAGE: suehunpark/account-service
+  DOCKER_IMAGE: suehunpark/account-command-service
 
 jobs:
   build-and-push:
@@ -78,7 +78,7 @@ jobs:
             # 여기서 image_tag를 account.nomad에 넘긴다
             nomad job run \
               -var="image_tag=${{ env.IMAGE_TAG }}" \
-              /opt/nomad-jobs/app/account-grpc.nomad
+              /opt/nomad-jobs/app/account-command-grpc.nomad
 
             nomad job status account
             echo "✅ Deployment triggered."

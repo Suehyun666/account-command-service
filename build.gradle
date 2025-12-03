@@ -23,10 +23,6 @@ dependencies {
     implementation 'io.quarkiverse.jooq:quarkus-jooq:2.1.0'
     implementation 'io.quarkus:quarkus-flyway'
 
-    //Redis
-    implementation 'io.quarkus:quarkus-redis-cache'
-    implementation 'io.quarkus:quarkus-redis-client'
-
     // Kafka
     implementation 'io.quarkus:quarkus-messaging-kafka'
 
